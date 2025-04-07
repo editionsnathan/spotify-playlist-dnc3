@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Validation des propositions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; padding: 1rem; background: #f9f9f9; text-align: center; }
+    h1 { font-size: 1.8rem; margin-bottom: 2rem; }
+    ul { list-style: none; padding: 0; max-width: 600px; margin: auto; }
+    li { background: #fff; margin: 1rem 0; padding: 1rem; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .actions a { margin-left: 10px; padding: 8px 12px; border-radius: 5px; text-decoration: none; color: white; font-weight: bold; }
+    .approve { background: #28a745; }
+    .reject { background: #dc3545; }
+  </style>
+</head>
+<body>
+  <h1>🛠️ Validation des propositions</h1>
+  <ul>
+    {% for song in proposals %}
+    <li>
+      {{ song.title }} - {{ song.artist }}
+      <div class="actions">
+        <a href="/validate/{{ loop.index0 }}" class="approve">✅ Valider</a>
+        <a href="/reject/{{ loop.index0 }}" class="reject">❌ Refuser</a>
+      </div>
+    </li>
+    {% else %}
+    <li>Aucune proposition en attente.</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
