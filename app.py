@@ -6,21 +6,25 @@ import os
 
 app = Flask(__name__)
 
-# Spotify API credentials
+# Variables d'environnement
 SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
 SPOTIPY_CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET")
-SPOTIPY_REDIRECT_URI = "http://localhost:5000/callback"
-SCOPE = "playlist-modify-public playlist-modify-private"
+SPOTIPY_REFRESH_TOKEN = os.environ.get("SPOTIPY_REFRESH_TOKEN")
+SPOTIFY_PLAYLIST_ID = os.environ.get("SPOTIFY_PLAYLIST_ID")
 
-sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
-                        client_secret=SPOTIPY_CLIENT_SECRET,
-                        redirect_uri=SPOTIPY_REDIRECT_URI,
-                        scope=SCOPE)
+# Fonction pour créer une instance Spotify avec un token valide
+def get_spotify_client():
+    auth_manager = spotipy.oauth2.SpotifyOAuth(
+        client_id=SPOTIPY_CLIENT_ID,
+        client_secret=SPOTIPY_CLIENT_SECRET,
+        redirect_uri="http://localhost:8888/callback",
+        scope="playlist-modify-public playlist-modify-private"
+    )
+    auth_manager.refresh_access_token(SPOTIPY_REFRESH_TOKEN)
+    token_info = auth_manager.get_cached_token()
+    return spotipy.Spotify(auth=token_info["access_token"])
 
-token_info = None
-playlist_id = os.environ.get("SPOTIFY_PLAYLIST_ID")  # à définir dans Render
-
-# Chargement des propositions depuis un fichier JSON
+# Fonctions de gestion des propositions
 def load_proposals():
     if not os.path.exists("proposals.json"):
         return []
@@ -49,17 +53,13 @@ def admin():
 
 @app.route("/validate/<int:index>")
 def validate(index):
-    global token_info
     proposals = load_proposals()
     if index >= len(proposals):
         return redirect(url_for("admin"))
     proposal = proposals.pop(index)
     save_proposals(proposals)
 
-    # Authentification avec Spotify
-    if not token_info or sp_oauth.is_token_expired(token_info):
-        token_info = sp_oauth.get_access_token(as_dict=False)
-    sp = spotipy.Spotify(auth=token_info)
+    sp = get_spotify_client()
 
     query = f"{proposal['title']} {proposal['artist']}"
     results = sp.search(q=query, limit=1, type="track")
@@ -67,10 +67,10 @@ def validate(index):
 
     if tracks:
         track_id = tracks[0]["id"]
-        sp.playlist_add_items(playlist_id, [track_id])
+        sp.playlist_add_items(SPOTIFY_PLAYLIST_ID, [track_id])
+
     return redirect(url_for("admin"))
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
