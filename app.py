@@ -34,16 +34,40 @@ def save_proposals(data):
     with open("proposals.json", "w") as f:
         json.dump(data, f, indent=2)
 
+def is_duplicate(title, artist, proposals, sp):
+    query = f"{title} {artist}"
+    results = sp.search(q=query, limit=1, type="track")
+    tracks = results.get("tracks", {}).get("items", [])
+    if not tracks:
+        return False
+    track_id = tracks[0]["id"]
+
+    playlist_tracks = sp.playlist_items(SPOTIFY_PLAYLIST_ID, fields="items.track.id,total", additional_types=['track'])
+    existing_ids = [item['track']['id'] for item in playlist_tracks['items']]
+    if track_id in existing_ids:
+        return True
+
+    for p in proposals:
+        if p["title"].strip().lower() == title.strip().lower() and p["artist"].strip().lower() == artist.strip().lower():
+            return True
+
+    return False
+
 @app.route("/", methods=["GET", "POST"])
 def index():
+    message = None
     if request.method == "POST":
         title = request.form["title"]
         artist = request.form["artist"]
         proposals = load_proposals()
-        proposals.append({"title": title, "artist": artist})
-        save_proposals(proposals)
-        return render_template("submitted.html")
-    return render_template("index.html")
+        sp = get_spotify_client()
+        if is_duplicate(title, artist, proposals, sp):
+            message = "🚫 Ce morceau est déjà proposé ou présent dans la playlist."
+        else:
+            proposals.append({"title": title, "artist": artist})
+            save_proposals(proposals)
+            return render_template("submitted.html")
+    return render_template("index.html", message=message)
 
 @app.route("/admin-login", methods=["GET", "POST"])
 def admin_login():
