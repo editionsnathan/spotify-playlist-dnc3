@@ -34,6 +34,16 @@ def save_proposals(data):
     with open("proposals.json", "w") as f:
         json.dump(data, f, indent=2)
 
+def load_refused():
+    if not os.path.exists("refused.json"):
+        return []
+    with open("refused.json", "r") as f:
+        return json.load(f)
+
+def save_refused(data):
+    with open("refused.json", "w") as f:
+        json.dump(data, f, indent=2)
+
 def is_duplicate(title, artist, proposals, sp):
     query = f"{title} {artist}"
     results = sp.search(q=query, limit=1, type="track")
@@ -117,10 +127,31 @@ def reject(index):
     if not session.get("admin"):
         return redirect("/admin-login")
     proposals = load_proposals()
+    refused = load_refused()
     if index < len(proposals):
-        proposals.pop(index)
+        refused.append(proposals.pop(index))
         save_proposals(proposals)
+        save_refused(refused)
     return redirect(url_for("admin"))
+
+@app.route("/refused")
+def view_refused():
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    refused = load_refused()
+    return render_template("refused.html", refused=refused)
+
+@app.route("/restore/<int:index>")
+def restore(index):
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    refused = load_refused()
+    proposals = load_proposals()
+    if index < len(refused):
+        proposals.append(refused.pop(index))
+        save_refused(refused)
+        save_proposals(proposals)
+    return redirect(url_for("view_refused"))
 
 @app.route("/preview")
 def preview():
