@@ -5,59 +5,105 @@
   <title>Statistiques - Playlist DNC3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: sans-serif; padding: 1rem; text-align: center; }
-    h1 { color: #1DB954; }
-    h2 { margin-top: 2rem; }
-    table { margin: auto; border-collapse: collapse; width: 90%; max-width: 700px; }
-    th, td { padding: 0.8rem; border: 1px solid #ccc; }
-    th { background-color: #1DB954; color: white; }
-    tr:nth-child(even) { background-color: #f9f9f9; }
-    .badge { background: gold; color: black; font-weight: bold; padding: 0.2rem 0.5rem; border-radius: 5px; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2196F3;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .top-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      background-color: #181818;
+      padding: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .top-links a {
+      color: #2196F3;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.95rem;
+      border: 1px solid #2196F3;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+    }
+
+    .container {
+      padding: 1rem 2rem;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h2 {
+      color: #1DB954;
+      margin-top: 2rem;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      background-color: #1e1e1e;
+      margin: 0.4rem 0;
+      padding: 0.6rem;
+      border-radius: 8px;
+    }
+
+    .export-btn {
+      display: block;
+      width: fit-content;
+      margin: 2rem auto;
+      background-color: #1DB954;
+      padding: 0.8rem 1.2rem;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
-  <h1>📊 Statistiques Playlist DNC3</h1>
 
-  <h2>🧮 Nombre total de propositions : {{ total }}</h2>
+  <header>📊 Statistiques</header>
 
-  <h2>👤 Top contributeurs</h2>
-  <table>
-    <tr><th>Login</th><th>Contributions</th><th>Badge</th></tr>
-    {% for user, count in top_logins %}
-    <tr>
-      <td>{{ user }}</td>
-      <td>{{ count }}</td>
-      <td>
-        {% if count >= 20 %}
-          <span class="badge">🏆 Légende</span>
-        {% elif count >= 10 %}
-          <span class="badge">🔥 Actif</span>
-        {% elif count >= 5 %}
-          <span class="badge">⭐ Contributeur</span>
-        {% else %}
-          -
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
+  <div class="top-links">
+    <a href="/admin">⬅ Retour admin</a>
+  </div>
 
-  <h2>🎶 Artistes les plus proposés</h2>
-  <table>
-    <tr><th>Artiste</th><th>Nombre de propositions</th></tr>
-    {% for artist, count in top_artists %}
-    <tr>
-      <td>{{ artist }}</td>
-      <td>{{ count }}</td>
-    </tr>
-    {% endfor %}
-  </table>
+  <div class="container">
+    <p>Nombre total de morceaux proposés : <strong>{{ total }}</strong></p>
 
-  <p style="margin-top:2rem;">
-  <a href="/admin">⬅ Retour admin</a> &nbsp;&nbsp;
-  <a href="/export" style="background:#1DB954; color:white; padding:0.6rem 1rem; border-radius:8px; text-decoration:none;">
-    📥 Export CSV
-  </a>
-</p>
+    <h2>🏆 Top contributeurs</h2>
+    <ul>
+      {% for login, count in top_logins %}
+      <li>👤 <strong>{{ login }}</strong> — {{ count }} propositions</li>
+      {% endfor %}
+    </ul>
+
+    <h2>🎤 Artistes les plus proposés</h2>
+    <ul>
+      {% for artist, count in top_artists %}
+      <li>🎶 <strong>{{ artist }}</strong> — {{ count }} fois</li>
+      {% endfor %}
+    </ul>
+
+    <a class="export-btn" href="/export">📥 Exporter en CSV</a>
+  </div>
+
 </body>
 </html>
