@@ -102,7 +102,20 @@ def admin_login():
 def admin():
     if not session.get("admin"):
         return redirect("/admin-login")
+
     proposals = load_proposals()
+    sp = get_spotify_client()
+
+    # Ajout de la pochette Spotify à chaque proposition
+    for p in proposals:
+        query = f"{p['title']} {p['artist']}"
+        results = sp.search(q=query, limit=1, type="track")
+        tracks = results.get("tracks", {}).get("items", [])
+        if tracks and tracks[0]["album"]["images"]:
+            p["image"] = tracks[0]["album"]["images"][0]["url"]
+        else:
+            p["image"] = ""
+
     return render_template("admin.html", proposals=proposals)
 
 @app.route("/validate/<int:index>")
