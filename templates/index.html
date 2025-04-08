@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: sans-serif; text-align: center; background: #fff; margin: 0; padding: 1rem; }
-    img { max-width: 120px; margin: 1rem auto; }
+    img.logo { max-width: 120px; margin: 1rem auto; }
     h1 { font-size: 1.8rem; margin-bottom: 1rem; }
     .alert {
       background-color: #ffdddd;
@@ -19,18 +19,55 @@
     form { display: flex; flex-direction: column; gap: 1rem; max-width: 320px; margin: auto; }
     input, button { padding: 1rem; font-size: 1rem; border-radius: 8px; border: 1px solid #ccc; }
     button { background-color: #1DB954; color: white; border: none; cursor: pointer; }
+    #preview { margin-top: 2rem; display: none; }
+    #preview img { width: 100px; }
+    #preview audio { margin-top: 0.5rem; }
   </style>
+  <script>
+    async function fetchPreview() {
+      const title = document.querySelector('input[name="title"]').value;
+      const artist = document.querySelector('input[name="artist"]').value;
+      const preview = document.getElementById("preview");
+      preview.style.display = "none";
+      if (title.length < 2 || artist.length < 2) return;
+
+      const res = await fetch(`/preview?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);
+      const data = await res.json();
+
+      if (data.found) {
+        preview.style.display = "block";
+        document.getElementById("cover").src = data.image;
+        document.getElementById("audio").src = data.preview_url || "";
+        document.getElementById("audio").style.display = data.preview_url ? "block" : "none";
+
+        if (data.explicit) {
+          document.getElementById("explicit").style.display = "block";
+        } else {
+          document.getElementById("explicit").style.display = "none";
+        }
+      }
+    }
+  </script>
 </head>
 <body>
-  <img src="/static/logo.png" alt="Logo">
+  <img class="logo" src="/static/logo.png" alt="Logo">
   <h1>🎵 Propose une chanson</h1>
+
   {% if message %}
-  <div class="alert">{{ message }}</div>
+    <div class="alert">{{ message }}</div>
   {% endif %}
+
   <form method="POST">
-    <input type="text" name="title" placeholder="Titre" required>
-    <input type="text" name="artist" placeholder="Artiste" required>
+    <input type="text" name="title" placeholder="Titre" required oninput="fetchPreview()">
+    <input type="text" name="artist" placeholder="Artiste" required oninput="fetchPreview()">
     <button type="submit">Proposer</button>
   </form>
+
+  <div id="preview">
+    <p><strong>Aperçu :</strong></p>
+    <img id="cover" src="" alt="Pochette">
+    <audio id="audio" controls></audio>
+    <p id="explicit" class="alert" style="display:none;">🚫 Ce titre est marqué comme explicite et ne pourra pas être proposé.</p>
+  </div>
 </body>
 </html>
