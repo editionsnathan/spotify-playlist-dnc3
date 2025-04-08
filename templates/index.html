@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -53,7 +52,7 @@
       if (data.found) {
         box.innerHTML = \`
           <img src="\${data.image}" alt="cover">
-          \${data.preview_url ? `<audio controls src="\${data.preview_url}"></audio>` : '<div>Pas d\'aperçu disponible</div>'}
+          \${data.preview_url ? `<audio controls src="\${data.preview_url}"></audio>` : '<div>Pas d'aperçu disponible</div>'}
           \${data.track_id ? `<div><a href="https://open.spotify.com/track/\${data.track_id}" target="_blank">Voir sur Spotify</a></div>` : ''}
         \`;
       } else {
