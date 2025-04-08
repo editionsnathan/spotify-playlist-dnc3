@@ -45,6 +45,16 @@ def save_refused(data):
     with open("refused.json", "w") as f:
         json.dump(data, f, indent=2)
 
+def load_validated():
+    if not os.path.exists("validated.json"):
+        return []
+    with open("validated.json", "r") as f:
+        return json.load(f)
+
+def save_validated(data):
+    with open("validated.json", "w") as f:
+        json.dump(data, f, indent=2)
+
 def is_duplicate(title, artist, proposals, sp):
     query = f"{title} {artist}"
     results = sp.search(q=query, limit=1, type="track")
@@ -106,7 +116,6 @@ def admin():
     proposals = load_proposals()
     sp = get_spotify_client()
 
-    # Ajout de la pochette Spotify à chaque proposition
     for p in proposals:
         query = f"{p['title']} {p['artist']}"
         results = sp.search(q=query, limit=1, type="track")
@@ -123,10 +132,13 @@ def validate(index):
     if not session.get("admin"):
         return redirect("/admin-login")
     proposals = load_proposals()
+    validated = load_validated()
     if index >= len(proposals):
         return redirect(url_for("admin"))
     proposal = proposals.pop(index)
+    validated.append(proposal)
     save_proposals(proposals)
+    save_validated(validated)
     sp = get_spotify_client()
     query = f"{proposal['title']} {proposal['artist']}"
     results = sp.search(q=query, limit=1, type="track")
@@ -185,10 +197,12 @@ def stats():
         return redirect("/admin-login")
 
     proposals = load_proposals()
+    validated = load_validated()
+    all_entries = proposals + validated
 
-    total = len(proposals)
-    logins = [p["login"] for p in proposals if "login" in p]
-    artists = [p["artist"].strip().lower() for p in proposals if "artist" in p]
+    total = len(all_entries)
+    logins = [p["login"] for p in all_entries if "login" in p]
+    artists = [p["artist"].strip().lower() for p in all_entries if "artist" in p]
 
     login_counts = Counter(logins)
     artist_counts = Counter(artists)
