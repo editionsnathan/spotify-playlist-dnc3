@@ -1,96 +1,136 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Playlist DNC3</title>
+  <title>Propose une chanson - DNC3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: sans-serif; text-align: center; background: #fff; margin: 0; padding: 1rem; }
-    img.logo { max-width: 120px; margin: 1rem auto; }
-    h1 { font-size: 1.8rem; margin-bottom: 1rem; }
-    .alert {
-      background-color: #ffdddd;
-      color: #b10000;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: white;
+      margin: 0;
       padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    header {
+      background-color: #1DB954;
+      padding: 1rem;
+      font-size: 1.5rem;
       font-weight: bold;
     }
-    form { display: flex; flex-direction: column; gap: 1rem; max-width: 320px; margin: auto; }
-    input, button { padding: 1rem; font-size: 1rem; border-radius: 8px; border: 1px solid #ccc; }
-    button { background-color: #1DB954; color: white; border: none; cursor: pointer; }
-    #preview { margin-top: 2rem; display: none; }
-    #preview img { width: 100px; border-radius: 10px; }
-    #preview iframe { margin-top: 1rem; border-radius: 12px; }
-    #preview a { display: inline-block; margin-top: 1rem; color: #1DB954; text-decoration: none; font-weight: bold; }
+
+    img.logo {
+      width: 100px;
+      margin: 1rem auto;
+    }
+
+    .form-box {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 380px;
+      margin: 2rem auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    input, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      border: 1px solid #333;
+      background-color: #2a2a2a;
+      color: white;
+    }
+
+    button {
+      background-color: #1DB954;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #17a84a;
+    }
+
+    .alert {
+      background-color: #ff4444;
+      color: white;
+      padding: 1rem;
+      margin: 1rem auto;
+      max-width: 380px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .preview {
+      margin-top: 1rem;
+    }
+
+    .preview img {
+      width: 100px;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
   </style>
   <script>
     async function fetchPreview() {
       const title = document.querySelector('input[name="title"]').value;
       const artist = document.querySelector('input[name="artist"]').value;
-      const preview = document.getElementById("preview");
-      const img = document.getElementById("cover");
-      const embed = document.getElementById("embed");
-      const link = document.getElementById("link");
-      const alertExplicit = document.getElementById("explicit");
+      const previewBox = document.getElementById("preview-box");
 
-      preview.style.display = "none";
-      img.src = "";
-      embed.innerHTML = "";
-      link.innerHTML = "";
-      alertExplicit.style.display = "none";
+      if (!title || !artist) {
+        previewBox.innerHTML = "";
+        return;
+      }
 
-      if (title.length < 2 || artist.length < 2) return;
-
-      const res = await fetch(`/preview?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);
-      const data = await res.json();
+      const response = await fetch(`/preview?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);
+      const data = await response.json();
 
       if (data.found) {
-        preview.style.display = "block";
-        img.src = data.image;
-
-        if (data.track_id) {
-          embed.innerHTML = `
-            <iframe src="https://open.spotify.com/embed/track/${data.track_id}"
-                    width="100%" height="80" frameborder="0"
-                    allowtransparency="true" allow="encrypted-media"></iframe>
-          `;
-
-          link.innerHTML = `
-            <a href="https://open.spotify.com/track/${data.track_id}" target="_blank">
-              🔗 Écouter le morceau complet sur Spotify
-            </a>
-          `;
-        }
-
-        if (data.explicit) {
-          alertExplicit.style.display = "block";
-        }
+        previewBox.innerHTML = `
+          <img src="${data.image}" alt="cover">
+          ${data.preview_url ? `<audio controls src="${data.preview_url}"></audio>` : '<div>Pas d'aperçu disponible</div>'}
+        `;
+      } else {
+        previewBox.innerHTML = '<div style="color:#aaa;">Aucun résultat Spotify</div>';
       }
     }
   </script>
 </head>
 <body>
-  <img class="logo" src="/static/logo.png" alt="Logo">
-  <h1>🎵 Propose une chanson</h1>
+
+  <header>🎵 Propose une chanson</header>
+
+  <img class="logo" src="/static/logo.png" alt="Logo DNC3">
 
   {% if message %}
-    <div class="alert">{{ message }}</div>
+  <div class="alert">{{ message }}</div>
   {% endif %}
 
-  <form method="POST">
-    <input type="text" name="login" placeholder="Ton login (obligatoire)" required>
-    <input type="text" name="title" placeholder="Titre" required oninput="fetchPreview()">
-    <input type="text" name="artist" placeholder="Artiste" required oninput="fetchPreview()">
-    <button type="submit">Proposer</button>
-  </form>
-
-  <div id="preview">
-    <p><strong>Aperçu du morceau :</strong></p>
-    <img id="cover" src="" alt="Pochette">
-    <div id="embed"></div>
-    <p id="explicit" class="alert" style="display:none;">⚠️ Ce morceau est marqué comme explicite.</p>
-    <p id="link"></p>
+  <div class="form-box">
+    <form method="POST" oninput="fetchPreview()">
+      <input type="text" name="login" placeholder="Votre login" required>
+      <input type="text" name="title" placeholder="Titre" required>
+      <input type="text" name="artist" placeholder="Artiste" required>
+      <div id="preview-box" class="preview"></div>
+      <button type="submit">Proposer</button>
+    </form>
   </div>
+
 </body>
 </html>
