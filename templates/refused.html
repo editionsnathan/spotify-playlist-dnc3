@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rejets - Playlist DNC3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 1rem; }
+    table { margin: auto; border-collapse: collapse; width: 90%; }
+    th, td { padding: 1rem; border: 1px solid #ccc; }
+    th { background-color: #1DB954; color: white; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    a.restore { background: #1DB954; color: white; padding: 0.4rem 0.7rem; border-radius: 6px; text-decoration: none; }
+    h1 { margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>❌ Morceaux refusés</h1>
+  <table>
+    <tr>
+      <th>Login</th>
+      <th>Titre</th>
+      <th>Artiste</th>
+      <th>Action</th>
+    </tr>
+    {% for r in refused %}
+    <tr>
+      <td>{{ r.login }}</td>
+      <td>{{ r.title }}</td>
+      <td>{{ r.artist }}</td>
+      <td><a class="restore" href="/restore/{{ loop.index0 }}">Restaurer</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p style="margin-top:2rem;"><a href="/admin">⬅ Retour à l'admin</a></p>
+</body>
+</html>
