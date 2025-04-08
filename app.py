@@ -242,6 +242,23 @@ def preview():
         "track_id": track["id"]
     })
 
+@app.route("/delete_refused/<int:index>")
+def delete_refused(index):
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    refused = load_refused()
+    if index < len(refused):
+        refused.pop(index)
+        save_refused(refused)
+    return redirect(url_for("view_refused"))
+
+@app.route("/delete_all_refused")
+def delete_all_refused():
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    save_refused([])  # vide la liste
+    return redirect(url_for("view_refused"))
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
