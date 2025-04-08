@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -58,10 +59,23 @@
     }
 
     .info {
-      margin-bottom: 0.8rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
     }
 
-    .info div {
+    .info img {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .details {
+      flex: 1;
+    }
+
+    .details div {
       margin-bottom: 0.4rem;
     }
 
@@ -116,9 +130,14 @@
     {% for p in proposals %}
     <div class="card">
       <div class="info">
-        <div><strong>👤 Login:</strong> {{ p.login }}</div>
-        <div><strong>🎵 Titre:</strong> {{ p.title }}</div>
-        <div><strong>🎤 Artiste:</strong> {{ p.artist }}</div>
+        {% if p.image %}
+        <img src="{{ p.image }}" alt="cover">
+        {% endif %}
+        <div class="details">
+          <div><strong>👤 Login:</strong> {{ p.login }}</div>
+          <div><strong>🎵 Titre:</strong> {{ p.title }}</div>
+          <div><strong>🎤 Artiste:</strong> {{ p.artist }}</div>
+        </div>
       </div>
       <div class="actions">
         <a class="validate" href="/validate/{{ loop.index0 }}">✔ Valider</a>
