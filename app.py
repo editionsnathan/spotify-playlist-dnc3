@@ -57,6 +57,7 @@ def is_duplicate(title, artist, proposals, sp):
 def index():
     message = None
     if request.method == "POST":
+        login = request.form["login"]
         title = request.form["title"]
         artist = request.form["artist"]
         proposals = load_proposals()
@@ -71,7 +72,7 @@ def index():
         elif is_duplicate(title, artist, proposals, sp):
             message = "🚫 Ce morceau est déjà proposé ou présent dans la playlist."
         else:
-            proposals.append({"title": title, "artist": artist})
+            proposals.append({"login": login, "title": title, "artist": artist})
             save_proposals(proposals)
             return render_template("submitted.html")
 
