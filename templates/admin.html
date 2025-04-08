@@ -5,55 +5,146 @@
   <title>Admin - Playlist DNC3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 1rem; }
-    table { margin: auto; border-collapse: collapse; width: 90%; }
-    th, td { padding: 1rem; border: 1px solid #ccc; }
-    th { background-color: #1DB954; color: white; }
-    tr:nth-child(even) { background-color: #f2f2f2; }
-    a.validate, a.reject {
-      padding: 0.4rem 0.7rem;
-      border-radius: 6px;
-      text-decoration: none;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
       color: white;
+      margin: 0;
+      padding: 0;
     }
-    a.validate { background: #1DB954; }
-    a.reject { background: #d80000; }
+
+    header {
+      background-color: #1DB954;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
     .top-links {
-      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      background-color: #181818;
+      padding: 0.8rem;
+      flex-wrap: wrap;
     }
+
     .top-links a {
-      margin: 0 10px;
       color: #1DB954;
       text-decoration: none;
       font-weight: bold;
+      font-size: 0.95rem;
+      border: 1px solid #1DB954;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem;
+      justify-content: center;
+    }
+
+    .card {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 280px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    }
+
+    .info {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .info img {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .details {
+      flex: 1;
+    }
+
+    .details div {
+      margin-bottom: 0.4rem;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    .actions a {
+      flex: 1;
+      text-align: center;
+      padding: 0.6rem;
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 0 0.2rem;
+    }
+
+    .validate {
+      background-color: #1DB954;
+    }
+
+    .reject {
+      background-color: #d32f2f;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        width: 100%;
+      }
+
+      .top-links {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
 <body>
+
+  <header>🛠 Interface Admin</header>
+
   <div class="top-links">
-    <a href="/refused">📂 Voir les morceaux refusés</a>
-    <a href="/">🏠 Retour à l'accueil</a>
+    <a href="/refused">📂 Voir les refus</a>
+    <a href="/stats">📊 Stats</a>
+    <a href="/">↩ Accueil</a>
   </div>
 
-  <h1>🛠 Interface Admin</h1>
-  <table>
-    <tr>
-      <th>Login</th>
-      <th>Titre</th>
-      <th>Artiste</th>
-      <th>Actions</th>
-    </tr>
+  <div class="container">
     {% for p in proposals %}
-    <tr>
-      <td>{{ p.login }}</td>
-      <td>{{ p.title }}</td>
-      <td>{{ p.artist }}</td>
-      <td>
-        <a class="validate" href="/validate/{{ loop.index0 }}">Valider</a>
-        <a class="reject" href="/reject/{{ loop.index0 }}">Refuser</a>
-      </td>
-    </tr>
+    <div class="card">
+      <div class="info">
+        {% if p.image %}
+        <img src="{{ p.image }}" alt="cover">
+        {% endif %}
+        <div class="details">
+          <div><strong>👤 Login:</strong> {{ p.login }}</div>
+          <div><strong>🎵 Titre:</strong> {{ p.title }}</div>
+          <div><strong>🎤 Artiste:</strong> {{ p.artist }}</div>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="validate" href="/validate/{{ loop.index0 }}">✔ Valider</a>
+        <a class="reject" href="/reject/{{ loop.index0 }}">✖ Refuser</a>
+      </div>
+    </div>
     {% endfor %}
-  </table>
+  </div>
+
 </body>
 </html>
