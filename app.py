@@ -212,19 +212,6 @@ def stats():
 
     return render_template("stats.html", total=total, top_logins=top_logins, top_artists=top_artists)
 
-@app.route("/export")
-def export():
-    if not session.get("admin"):
-        return redirect("/admin-login")
-
-    proposals = load_proposals()
-    lines = ["login,title,artist"]
-    for p in proposals:
-        login = p.get("login", "")
-        title = p.get("title", "")
-        artist = p.get("artist", "")
-        lines.append(f"{login},{title},{artist}")
-
     csv_data = "\n".join(lines)
     return Response(
         csv_data,
