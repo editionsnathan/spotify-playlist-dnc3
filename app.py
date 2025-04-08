@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, url_for, session, jsonify
+from flask import Flask, request, redirect, render_template, url_for, session, jsonify, Response
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import json
@@ -172,6 +172,26 @@ def stats():
     top_artists = artist_counts.most_common(10)
 
     return render_template("stats.html", total=total, top_logins=top_logins, top_artists=top_artists)
+
+@app.route("/export")
+def export():
+    if not session.get("admin"):
+        return redirect("/admin-login")
+
+    proposals = load_proposals()
+    lines = ["login,title,artist"]
+    for p in proposals:
+        login = p.get("login", "")
+        title = p.get("title", "")
+        artist = p.get("artist", "")
+        lines.append(f"{login},{title},{artist}")
+
+    csv_data = "\n".join(lines)
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=playlist_dnc3_proposals.csv"}
+    )
 
 @app.route("/preview")
 def preview():
