@@ -152,7 +152,19 @@ def reject(index):
 def view_refused():
     if not session.get("admin"):
         return redirect("/admin-login")
+
     refused = load_refused()
+    sp = get_spotify_client()
+
+    for r in refused:
+        query = f"{r['title']} {r['artist']}"
+        results = sp.search(q=query, limit=1, type="track")
+        tracks = results.get("tracks", {}).get("items", [])
+        if tracks and tracks[0]["album"]["images"]:
+            r["image"] = tracks[0]["album"]["images"][0]["url"]
+        else:
+            r["image"] = ""
+
     return render_template("refused.html", refused=refused)
 
 @app.route("/restore/<int:index>")
