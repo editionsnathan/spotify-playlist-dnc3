@@ -35,31 +35,6 @@
       font-size: 0.9rem;
     }
   </style>
-  <script>
-    async function fetchPreview() {
-      const title = document.querySelector('input[name="title"]').value;
-      const artist = document.querySelector('input[name="artist"]').value;
-      const box = document.getElementById("preview-box");
-
-      if (!title || !artist) {
-        box.innerHTML = "";
-        return;
-      }
-
-      const response = await fetch(`/preview?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);
-      const data = await response.json();
-
-      if (data.found) {
-        box.innerHTML = \`
-          <img src="\${data.image}" alt="cover">
-          \${data.preview_url ? `<audio controls src="\${data.preview_url}"></audio>` : '<div>Pas d'aperçu disponible</div>'}
-          \${data.track_id ? `<div><a href="https://open.spotify.com/track/\${data.track_id}" target="_blank">Voir sur Spotify</a></div>` : ''}
-        \`;
-      } else {
-        box.innerHTML = "<div>Aucun résultat trouvé</div>";
-      }
-    }
-  </script>
 </head>
 <body>
   <img src="/static/logo.png" alt="Logo DNC3">
@@ -76,5 +51,36 @@
     <div class="preview" id="preview-box"></div>
     <button type="submit">Proposer</button>
   </form>
+
+  <script>
+    async function fetchPreview() {
+      const title = document.querySelector('input[name="title"]').value;
+      const artist = document.querySelector('input[name="artist"]').value;
+      const box = document.getElementById("preview-box");
+
+      if (!title || !artist) {
+        box.innerHTML = "";
+        return;
+      }
+
+      try {
+        const response = await fetch(`/preview?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`);
+        const data = await response.json();
+
+        if (data.found) {
+          box.innerHTML = `
+            <img src="${data.image}" alt="cover">
+            ${data.preview_url ? `<audio controls src="${data.preview_url}"></audio>` : '<div>Pas d\'aperçu disponible</div>'}
+            ${data.track_id ? `<div><a href="https://open.spotify.com/track/${data.track_id}" target="_blank">Voir sur Spotify</a></div>` : ''}
+          `;
+        } else {
+          box.innerHTML = "<div>Aucun résultat trouvé</div>";
+        }
+      } catch (err) {
+        console.error("Erreur lors du chargement de l'aperçu :", err);
+        box.innerHTML = "<div>Erreur lors du chargement</div>";
+      }
+    }
+  </script>
 </body>
 </html>
