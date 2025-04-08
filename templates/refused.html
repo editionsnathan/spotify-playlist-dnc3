@@ -1,37 +1,138 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Rejets - Playlist DNC3</title>
+  <title>Morceaux Refusés - Playlist DNC3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 1rem; }
-    table { margin: auto; border-collapse: collapse; width: 90%; }
-    th, td { padding: 1rem; border: 1px solid #ccc; }
-    th { background-color: #1DB954; color: white; }
-    tr:nth-child(even) { background-color: #f2f2f2; }
-    a.restore { background: #1DB954; color: white; padding: 0.4rem 0.7rem; border-radius: 6px; text-decoration: none; }
-    h1 { margin-bottom: 1.5rem; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #ff5252;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .top-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      background-color: #181818;
+      padding: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .top-links a {
+      color: #ff5252;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.95rem;
+      border: 1px solid #ff5252;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem;
+      justify-content: center;
+    }
+
+    .card {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 280px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    }
+
+    .info {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .info img {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .details {
+      flex: 1;
+    }
+
+    .details div {
+      margin-bottom: 0.4rem;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .actions a {
+      background-color: #1DB954;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        width: 100%;
+      }
+
+      .top-links {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>❌ Morceaux refusés</h1>
-  <table>
-    <tr>
-      <th>Login</th>
-      <th>Titre</th>
-      <th>Artiste</th>
-      <th>Action</th>
-    </tr>
+
+  <header>❌ Morceaux Refusés</header>
+
+  <div class="top-links">
+    <a href="/admin">⬅ Retour admin</a>
+  </div>
+
+  <div class="container">
     {% for r in refused %}
-    <tr>
-      <td>{{ r.login }}</td>
-      <td>{{ r.title }}</td>
-      <td>{{ r.artist }}</td>
-      <td><a class="restore" href="/restore/{{ loop.index0 }}">Restaurer</a></td>
-    </tr>
+    <div class="card">
+      <div class="info">
+        {% if r.image %}
+        <img src="{{ r.image }}" alt="cover">
+        {% endif %}
+        <div class="details">
+          <div><strong>👤 Login:</strong> {{ r.login }}</div>
+          <div><strong>🎵 Titre:</strong> {{ r.title }}</div>
+          <div><strong>🎤 Artiste:</strong> {{ r.artist }}</div>
+        </div>
+      </div>
+      <div class="actions">
+        <a href="/restore/{{ loop.index0 }}">🔁 Restaurer</a>
+      </div>
+    </div>
     {% endfor %}
-  </table>
-  <p style="margin-top:2rem;"><a href="/admin">⬅ Retour à l'admin</a></p>
+  </div>
+
 </body>
 </html>
