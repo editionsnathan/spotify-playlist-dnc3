@@ -62,10 +62,10 @@ def index():
         proposals = load_proposals()
         sp = get_spotify_client()
 
-        # Rechercher la chanson
         query = f"{title} {artist}"
         results = sp.search(q=query, limit=1, type="track")
         tracks = results.get("tracks", {}).get("items", [])
+
         if not tracks:
             message = "🚫 Ce morceau est introuvable sur Spotify."
         elif is_duplicate(title, artist, proposals, sp):
@@ -74,6 +74,7 @@ def index():
             proposals.append({"title": title, "artist": artist})
             save_proposals(proposals)
             return render_template("submitted.html")
+
     return render_template("index.html", message=message)
 
 @app.route("/admin-login", methods=["GET", "POST"])
@@ -139,7 +140,8 @@ def preview():
         "found": True,
         "image": track["album"]["images"][0]["url"] if track["album"]["images"] else "",
         "preview_url": track.get("preview_url"),
-        "explicit": track.get("explicit", False)
+        "explicit": track.get("explicit", False),
+        "track_id": track["id"]
     })
 
 if __name__ == "__main__":
