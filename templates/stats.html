@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Statistiques - Playlist DNC3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; padding: 1rem; text-align: center; }
+    h1 { color: #1DB954; }
+    h2 { margin-top: 2rem; }
+    table { margin: auto; border-collapse: collapse; width: 90%; max-width: 700px; }
+    th, td { padding: 0.8rem; border: 1px solid #ccc; }
+    th { background-color: #1DB954; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .badge { background: gold; color: black; font-weight: bold; padding: 0.2rem 0.5rem; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>📊 Statistiques Playlist DNC3</h1>
+
+  <h2>🧮 Nombre total de propositions : {{ total }}</h2>
+
+  <h2>👤 Top contributeurs</h2>
+  <table>
+    <tr><th>Login</th><th>Contributions</th><th>Badge</th></tr>
+    {% for user, count in top_logins %}
+    <tr>
+      <td>{{ user }}</td>
+      <td>{{ count }}</td>
+      <td>
+        {% if count >= 20 %}
+          <span class="badge">🏆 Légende</span>
+        {% elif count >= 10 %}
+          <span class="badge">🔥 Actif</span>
+        {% elif count >= 5 %}
+          <span class="badge">⭐ Contributeur</span>
+        {% else %}
+          -
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>🎶 Artistes les plus proposés</h2>
+  <table>
+    <tr><th>Artiste</th><th>Nombre de propositions</th></tr>
+    {% for artist, count in top_artists %}
+    <tr>
+      <td>{{ artist }}</td>
+      <td>{{ count }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <p style="margin-top:2rem;"><a href="/admin">⬅ Retour admin</a></p>
+</body>
+</html>
