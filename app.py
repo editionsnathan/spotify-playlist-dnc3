@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, url_for, session
+from flask import Flask, request, redirect, render_template, url_for, session, jsonify
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import json
@@ -61,12 +61,23 @@ def index():
         artist = request.form["artist"]
         proposals = load_proposals()
         sp = get_spotify_client()
-        if is_duplicate(title, artist, proposals, sp):
-            message = "🚫 Ce morceau est déjà proposé ou présent dans la playlist."
+
+        # Rechercher la chanson et vérifier si explicite
+        query = f"{title} {artist}"
+        results = sp.search(q=query, limit=1, type="track")
+        tracks = results.get("tracks", {}).get("items", [])
+        if not tracks:
+            message = "🚫 Ce morceau est introuvable sur Spotify."
         else:
-            proposals.append({"title": title, "artist": artist})
-            save_proposals(proposals)
-            return render_template("submitted.html")
+            track = tracks[0]
+            if track.get("explicit", False):
+                message = "🚫 Ce morceau est marqué comme explicite et ne peut pas être proposé."
+            elif is_duplicate(title, artist, proposals, sp):
+                message = "🚫 Ce morceau est déjà proposé ou présent dans la playlist."
+            else:
+                proposals.append({"title": title, "artist": artist})
+                save_proposals(proposals)
+                return render_template("submitted.html")
     return render_template("index.html", message=message)
 
 @app.route("/admin-login", methods=["GET", "POST"])
@@ -112,6 +123,28 @@ def reject(index):
         proposals.pop(index)
         save_proposals(proposals)
     return redirect(url_for("admin"))
+
+@app.route("/preview")
+def preview():
+    title = request.args.get("title", "")
+    artist = request.args.get("artist", "")
+    if not title or not artist:
+        return jsonify({"found": False})
+
+    sp = get_spotify_client()
+    query = f"{title} {artist}"
+    results = sp.search(q=query, limit=1, type="track")
+    tracks = results.get("tracks", {}).get("items", [])
+    if not tracks:
+        return jsonify({"found": False})
+
+    track = tracks[0]
+    return jsonify({
+        "found": True,
+        "image": track["album"]["images"][0]["url"] if track["album"]["images"] else "",
+        "preview_url": track.get("preview_url"),
+        "explicit": track.get("explicit", False)
+    })
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
