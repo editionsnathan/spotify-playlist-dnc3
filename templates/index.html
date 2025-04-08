@@ -21,21 +21,24 @@
     button { background-color: #1DB954; color: white; border: none; cursor: pointer; }
     #preview { margin-top: 2rem; display: none; }
     #preview img { width: 100px; border-radius: 10px; }
-    #preview audio { margin-top: 1rem; width: 100%; max-width: 320px; }
+    #preview iframe { margin-top: 1rem; border-radius: 12px; }
+    #preview a { display: inline-block; margin-top: 1rem; color: #1DB954; text-decoration: none; font-weight: bold; }
   </style>
   <script>
     async function fetchPreview() {
       const title = document.querySelector('input[name="title"]').value;
       const artist = document.querySelector('input[name="artist"]').value;
       const preview = document.getElementById("preview");
-      const audio = document.getElementById("audio");
       const img = document.getElementById("cover");
+      const embed = document.getElementById("embed");
+      const link = document.getElementById("link");
       const alertExplicit = document.getElementById("explicit");
 
       preview.style.display = "none";
       img.src = "";
-      audio.style.display = "none";
-      audio.src = "";
+      embed.innerHTML = "";
+      link.innerHTML = "";
+      alertExplicit.style.display = "none";
 
       if (title.length < 2 || artist.length < 2) return;
 
@@ -46,17 +49,22 @@
         preview.style.display = "block";
         img.src = data.image;
 
-        if (data.preview_url) {
-          audio.src = data.preview_url;
-          audio.style.display = "block";
-          audio.load();
+        if (data.track_id) {
+          embed.innerHTML = `
+            <iframe src="https://open.spotify.com/embed/track/${data.track_id}"
+                    width="100%" height="80" frameborder="0"
+                    allowtransparency="true" allow="encrypted-media"></iframe>
+          `;
+
+          link.innerHTML = `
+            <a href="https://open.spotify.com/track/${data.track_id}" target="_blank">
+              🔗 Écouter le morceau complet sur Spotify
+            </a>
+          `;
         }
 
-        // Optionnel : afficher si explicite (sans bloquer)
         if (data.explicit) {
           alertExplicit.style.display = "block";
-        } else {
-          alertExplicit.style.display = "none";
         }
       }
     }
@@ -79,8 +87,9 @@
   <div id="preview">
     <p><strong>Aperçu du morceau :</strong></p>
     <img id="cover" src="" alt="Pochette">
-    <audio id="audio" controls style="display:none;"></audio>
+    <div id="embed"></div>
     <p id="explicit" class="alert" style="display:none;">⚠️ Ce morceau est marqué comme explicite.</p>
+    <p id="link"></p>
   </div>
 </body>
 </html>
