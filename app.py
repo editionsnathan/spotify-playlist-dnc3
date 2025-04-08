@@ -1,9 +1,8 @@
-from flask import Flask, request, redirect, render_template, url_for, session, jsonify, Response
+from flask import Flask, request, redirect, render_template, url_for, session, jsonify
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import json
 import os
-from collections import Counter
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("APP_SECRET", "supersecret")
@@ -35,16 +34,6 @@ def save_proposals(data):
     with open("proposals.json", "w") as f:
         json.dump(data, f, indent=2)
 
-def load_refused():
-    if not os.path.exists("refused.json"):
-        return []
-    with open("refused.json", "r") as f:
-        return json.load(f)
-
-def save_refused(data):
-    with open("refused.json", "w") as f:
-        json.dump(data, f, indent=2)
-
 def is_duplicate(title, artist, proposals, sp):
     query = f"{title} {artist}"
     results = sp.search(q=query, limit=1, type="track")
@@ -68,7 +57,6 @@ def is_duplicate(title, artist, proposals, sp):
 def index():
     message = None
     if request.method == "POST":
-        login = request.form["login"]
         title = request.form["title"]
         artist = request.form["artist"]
         proposals = load_proposals()
@@ -83,7 +71,7 @@ def index():
         elif is_duplicate(title, artist, proposals, sp):
             message = "🚫 Ce morceau est déjà proposé ou présent dans la playlist."
         else:
-            proposals.append({"login": login, "title": title, "artist": artist})
+            proposals.append({"title": title, "artist": artist})
             save_proposals(proposals)
             return render_template("submitted.html")
 
@@ -102,20 +90,7 @@ def admin_login():
 def admin():
     if not session.get("admin"):
         return redirect("/admin-login")
-
     proposals = load_proposals()
-    sp = get_spotify_client()
-
-    # Ajout de la pochette Spotify à chaque proposition
-    for p in proposals:
-        query = f"{p['title']} {p['artist']}"
-        results = sp.search(q=query, limit=1, type="track")
-        tracks = results.get("tracks", {}).get("items", [])
-        if tracks and tracks[0]["album"]["images"]:
-            p["image"] = tracks[0]["album"]["images"][0]["url"]
-        else:
-            p["image"] = ""
-
     return render_template("admin.html", proposals=proposals)
 
 @app.route("/validate/<int:index>")
@@ -141,82 +116,10 @@ def reject(index):
     if not session.get("admin"):
         return redirect("/admin-login")
     proposals = load_proposals()
-    refused = load_refused()
     if index < len(proposals):
-        refused.append(proposals.pop(index))
+        proposals.pop(index)
         save_proposals(proposals)
-        save_refused(refused)
     return redirect(url_for("admin"))
-
-@app.route("/refused")
-def view_refused():
-    if not session.get("admin"):
-        return redirect("/admin-login")
-
-    refused = load_refused()
-    sp = get_spotify_client()
-
-    for r in refused:
-        query = f"{r['title']} {r['artist']}"
-        results = sp.search(q=query, limit=1, type="track")
-        tracks = results.get("tracks", {}).get("items", [])
-        if tracks and tracks[0]["album"]["images"]:
-            r["image"] = tracks[0]["album"]["images"][0]["url"]
-        else:
-            r["image"] = ""
-
-    return render_template("refused.html", refused=refused)
-
-@app.route("/restore/<int:index>")
-def restore(index):
-    if not session.get("admin"):
-        return redirect("/admin-login")
-    refused = load_refused()
-    proposals = load_proposals()
-    if index < len(refused):
-        proposals.append(refused.pop(index))
-        save_refused(refused)
-        save_proposals(proposals)
-    return redirect(url_for("view_refused"))
-
-@app.route("/stats")
-def stats():
-    if not session.get("admin"):
-        return redirect("/admin-login")
-
-    proposals = load_proposals()
-
-    total = len(proposals)
-    logins = [p["login"] for p in proposals if "login" in p]
-    artists = [p["artist"].strip().lower() for p in proposals if "artist" in p]
-
-    login_counts = Counter(logins)
-    artist_counts = Counter(artists)
-
-    top_logins = login_counts.most_common()
-    top_artists = artist_counts.most_common(10)
-
-    return render_template("stats.html", total=total, top_logins=top_logins, top_artists=top_artists)
-
-@app.route("/export")
-def export():
-    if not session.get("admin"):
-        return redirect("/admin-login")
-
-    proposals = load_proposals()
-    lines = ["login,title,artist"]
-    for p in proposals:
-        login = p.get("login", "")
-        title = p.get("title", "")
-        artist = p.get("artist", "")
-        lines.append(f"{login},{title},{artist}")
-
-    csv_data = "\n".join(lines)
-    return Response(
-        csv_data,
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment;filename=playlist_dnc3_proposals.csv"}
-    )
 
 @app.route("/preview")
 def preview():
