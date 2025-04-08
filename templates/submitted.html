@@ -2,15 +2,55 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Merci !</title>
+  <title>Merci pour ta suggestion !</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { text-align: center; font-family: sans-serif; padding: 2rem; }
-    a { display: inline-block; margin-top: 2rem; font-weight: bold; color: #1DB954; text-decoration: none; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    img.logo {
+      max-width: 100px;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      color: #1DB954;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    a {
+      display: inline-block;
+      padding: 0.8rem 1.2rem;
+      background-color: #1DB954;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover {
+      background-color: #18a74d;
+    }
   </style>
 </head>
 <body>
-  <h1>🎶 Merci pour ta suggestion !</h1>
-  <a href="/">Proposer une autre chanson</a>
+
+  <img src="/static/logo.png" alt="Logo" class="logo">
+  <h1>✅ Merci pour ta suggestion !</h1>
+  <p>Ton morceau a bien été soumis. Il sera vérifié par un admin avant d’être ajouté à la playlist.</p>
+  <a href="/">🎵 Proposer un autre morceau</a>
+
 </body>
 </html>
