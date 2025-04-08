@@ -62,22 +62,18 @@ def index():
         proposals = load_proposals()
         sp = get_spotify_client()
 
-        # Rechercher la chanson et vérifier si explicite
+        # Rechercher la chanson
         query = f"{title} {artist}"
         results = sp.search(q=query, limit=1, type="track")
         tracks = results.get("tracks", {}).get("items", [])
         if not tracks:
             message = "🚫 Ce morceau est introuvable sur Spotify."
+        elif is_duplicate(title, artist, proposals, sp):
+            message = "🚫 Ce morceau est déjà proposé ou présent dans la playlist."
         else:
-            track = tracks[0]
-            if track.get("explicit", False):
-                message = "🚫 Ce morceau est marqué comme explicite et ne peut pas être proposé."
-            elif is_duplicate(title, artist, proposals, sp):
-                message = "🚫 Ce morceau est déjà proposé ou présent dans la playlist."
-            else:
-                proposals.append({"title": title, "artist": artist})
-                save_proposals(proposals)
-                return render_template("submitted.html")
+            proposals.append({"title": title, "artist": artist})
+            save_proposals(proposals)
+            return render_template("submitted.html")
     return render_template("index.html", message=message)
 
 @app.route("/admin-login", methods=["GET", "POST"])
