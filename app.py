@@ -4,6 +4,7 @@ from spotipy.oauth2 import SpotifyOAuth
 import json
 import os
 from collections import Counter
+import unicodedata
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("APP_SECRET", "supersecret")
@@ -24,6 +25,9 @@ def get_spotify_client():
     auth_manager.refresh_access_token(SPOTIPY_REFRESH_TOKEN)
     token_info = auth_manager.get_cached_token()
     return spotipy.Spotify(auth=token_info["access_token"])
+
+def normalize(text):
+    return unicodedata.normalize("NFKD", text.strip().lower()).encode("ASCII", "ignore").decode("utf-8")
 
 def load_proposals():
     if not os.path.exists("proposals.json"):
@@ -187,11 +191,8 @@ def stats():
     validated = load_validated()
     all_entries = proposals + validated
     total = len(all_entries)
-    import unicodedata
-def normalize(text):
-    return unicodedata.normalize("NFKD", text.strip().lower()).encode("ASCII", "ignore").decode("utf-8")
-logins = [normalize(p["login"]) for p in all_entries if "login" in p]
-artists = [normalize(p["artist"]) for p in all_entries if "artist" in p]
+    logins = [normalize(p["login"]) for p in all_entries if "login" in p]
+    artists = [normalize(p["artist"]) for p in all_entries if "artist" in p]
     login_counts = Counter(logins)
     artist_counts = Counter(artists)
     top_logins = login_counts.most_common()
@@ -202,12 +203,10 @@ artists = [normalize(p["artist"]) for p in all_entries if "artist" in p]
 def reset_stats():
     if not session.get("admin"):
         return redirect("/admin-login")
-
     password = request.form.get("confirm_password")
     if password != ADMIN_PASSWORD:
         flash("❌ Mot de passe incorrect.")
         return redirect("/stats")
-
     save_validated([])
     flash("✅ Statistiques réinitialisées avec succès.")
     return redirect("/stats")
