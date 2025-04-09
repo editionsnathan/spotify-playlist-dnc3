@@ -199,9 +199,12 @@ def stats():
 def reset_stats():
     if not session.get("admin"):
         return redirect("/admin-login")
+
     password = request.form.get("confirm_password")
     if password != ADMIN_PASSWORD:
-        return "❌ Mot de passe incorrect", 403
+        flash("❌ Mot de passe incorrect.")
+        return redirect("/stats")
+
     save_validated([])
     flash("✅ Statistiques réinitialisées avec succès.")
     return redirect("/stats")
