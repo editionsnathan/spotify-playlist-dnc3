@@ -86,14 +86,16 @@
       font-weight: bold;
       cursor: pointer;
     }
-
-    .flash {
-      background-color: #2ecc71;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
+    
+    {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="flash {{ 'error' if '❌' in message else 'success' }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
   </style>
 </head>
 <body>
