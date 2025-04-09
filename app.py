@@ -187,8 +187,11 @@ def stats():
     validated = load_validated()
     all_entries = proposals + validated
     total = len(all_entries)
-    logins = [p["login"].lower() for p in all_entries if "login" in p]
-    artists = [p["artist"].strip().lower() for p in all_entries if "artist" in p]
+    import unicodedata
+def normalize(text):
+    return unicodedata.normalize("NFKD", text.strip().lower()).encode("ASCII", "ignore").decode("utf-8")
+logins = [normalize(p["login"]) for p in all_entries if "login" in p]
+artists = [normalize(p["artist"]) for p in all_entries if "artist" in p]
     login_counts = Counter(logins)
     artist_counts = Counter(artists)
     top_logins = login_counts.most_common()
