@@ -75,6 +75,29 @@
       border-radius: 8px;
       text-decoration: none;
     }
+
+    .reset-section {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #444;
+    }
+
+    .reset-section input {
+      width: 100%;
+      padding: 0.6rem;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .reset-section button {
+      background-color: #b10000;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -102,7 +125,14 @@
       {% endfor %}
     </ul>
 
-    <!-- <a class="export-btn" href="/export">📥 Exporter en CSV</a> -->
+    <div class="reset-section">
+      <h3>🔁 Réinitialiser les statistiques</h3>
+      <form method="POST" action="/reset-stats">
+        <input type="password" name="confirm_password" placeholder="Mot de passe admin" required>
+        <button type="submit">Réinitialiser</button>
+      </form>
+    </div>
+
   </div>
 
 </body>
