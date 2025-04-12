@@ -9,6 +9,7 @@ import unicodedata
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("APP_SECRET", "supersecret")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 
 # Spotify config
 SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
