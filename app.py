@@ -146,6 +146,44 @@ def view_refused():
             r.track_id = ""
     return render_template("refused.html", refused=refused)
 
+@app.route("/reject/<int:id>")
+def reject(id):
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    p = Proposal.query.get(id)
+    if p:
+        p.status = "refused"
+        db.session.commit()
+    return redirect(url_for("admin"))
+
+@app.route("/restore/<int:id>")
+def restore(id):
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    p = Proposal.query.get(id)
+    if p and p.status == "refused":
+        p.status = "pending"
+        db.session.commit()
+    return redirect(url_for("view_refused"))
+
+@app.route("/delete_refused/<int:id>")
+def delete_refused(id):
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    p = Proposal.query.get(id)
+    if p and p.status == "refused":
+        db.session.delete(p)
+        db.session.commit()
+    return redirect(url_for("view_refused"))
+
+@app.route("/delete_all_refused")
+def delete_all_refused():
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    Proposal.query.filter_by(status="refused").delete()
+    db.session.commit()
+    return redirect(url_for("view_refused"))
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
