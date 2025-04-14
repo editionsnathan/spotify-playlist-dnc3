@@ -12,6 +12,7 @@
       margin: 0;
       padding: 0;
     }
+
     header {
       background-color: #1DB954;
       padding: 1rem;
@@ -20,6 +21,7 @@
       font-weight: bold;
       color: #fff;
     }
+
     .top-links {
       display: flex;
       justify-content: center;
@@ -28,6 +30,7 @@
       padding: 0.8rem;
       flex-wrap: wrap;
     }
+
     .top-links a {
       color: #1DB954;
       text-decoration: none;
@@ -37,6 +40,7 @@
       padding: 0.4rem 0.8rem;
       border-radius: 6px;
     }
+
     .container {
       display: flex;
       flex-wrap: wrap;
@@ -44,35 +48,43 @@
       padding: 1rem;
       justify-content: center;
     }
+
     .card {
       background-color: #1e1e1e;
       border-radius: 12px;
       padding: 1rem;
       width: 280px;
       box-shadow: 0 0 8px rgba(0,0,0,0.4);
+      position: relative;
     }
+
     .info {
       display: flex;
       gap: 1rem;
       align-items: center;
     }
+
     .info img {
       width: 80px;
       height: 80px;
       border-radius: 8px;
       object-fit: cover;
     }
+
     .details {
       flex: 1;
     }
+
     .details div {
       margin-bottom: 0.4rem;
     }
+
     .actions {
       display: flex;
       justify-content: space-between;
       margin-top: 1rem;
     }
+
     .actions a {
       flex: 1;
       text-align: center;
@@ -83,28 +95,60 @@
       font-weight: bold;
       margin: 0 0.2rem;
     }
+
     .validate {
       background-color: #1DB954;
     }
+
     .reject {
       background-color: #d32f2f;
     }
-    .preview {
-      margin-top: 1rem;
-    }
+
     .explicit {
       color: #ff5252;
       font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    .player-btn {
+      margin-top: 0.5rem;
+      background: #333;
+      color: #1DB954;
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    iframe {
+      margin-top: 0.5rem;
+      border-radius: 12px;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        width: 100%;
+      }
     }
   </style>
+  <script>
+    function togglePlayer(id) {
+      const iframe = document.getElementById("player-" + id);
+      iframe.style.display = iframe.style.display === "block" ? "none" : "block";
+    }
+  </script>
 </head>
 <body>
 
   <header>🛠 Interface Admin</header>
+
   <div class="top-links">
     <a href="/refused">📂 Voir les refus</a>
     <a href="/stats">📊 Stats</a>
   </div>
+
   <div class="container">
     {% for p in proposals %}
     <div class="card">
@@ -119,16 +163,12 @@
           {% if p.explicit %}
           <div class="explicit">⚠️ Explicite</div>
           {% endif %}
+          {% if p.preview_url %}
+          <button class="player-btn" onclick="togglePlayer({{ p.id }})">▶️ Écouter</button>
+          <iframe id="player-{{ p.id }}" src="https://open.spotify.com/embed/track/{{ p.track_id }}" width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+          {% endif %}
         </div>
       </div>
-      {% if p.preview_url %}
-      <div class="preview">
-        <audio controls style="width: 100%;">
-          <source src="{{ p.preview_url }}" type="audio/mpeg">
-          Ton navigateur ne supporte pas l'audio.
-        </audio>
-      </div>
-      {% endif %}
       <div class="actions">
         <a class="validate" href="/validate/{{ p.id }}">✔ Valider</a>
         <a class="reject" href="/reject/{{ p.id }}">✖ Refuser</a>
@@ -136,5 +176,6 @@
     </div>
     {% endfor %}
   </div>
+
 </body>
 </html>
