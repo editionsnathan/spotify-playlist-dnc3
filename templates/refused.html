@@ -41,20 +41,6 @@
       border-radius: 6px;
     }
 
-    .delete-all {
-      text-align: center;
-      margin: 1rem;
-    }
-
-    .delete-all a {
-      background-color: #b00020;
-      color: white;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
     .container {
       display: flex;
       flex-wrap: wrap;
@@ -94,25 +80,27 @@
 
     .actions {
       display: flex;
-      justify-content: center;
-      gap: 0.5rem;
+      justify-content: space-between;
       margin-top: 1rem;
     }
 
     .actions a {
-      padding: 0.6rem 1rem;
+      flex: 1;
+      text-align: center;
+      padding: 0.6rem;
       border-radius: 8px;
       color: white;
       text-decoration: none;
       font-weight: bold;
+      margin: 0 0.2rem;
     }
 
-    .actions a.restore {
+    .restore {
       background-color: #1DB954;
     }
 
-    .actions a.delete {
-      background-color: #ff5252;
+    .delete {
+      background-color: #d32f2f;
     }
 
     @media (max-width: 600px) {
@@ -133,13 +121,7 @@
 
   <div class="top-links">
     <a href="/admin">⬅ Retour admin</a>
-  </div>
-
-  <div class="delete-all">
-    <a href="/delete_all_refused"
-       onclick="return confirm('⚠️ Supprimer tous les morceaux refusés ? Cette action est irréversible.')">
-       🧹 Supprimer tous les refusés
-    </a>
+    <a href="/delete_all_refused">🗑 Tout supprimer</a>
   </div>
 
   <div class="container">
@@ -156,9 +138,8 @@
         </div>
       </div>
       <div class="actions">
-        <a href="/restore/{{ loop.index0 }}" class="restore">🔁 Restaurer</a>
-        <a href="/delete_refused/{{ loop.index0 }}" class="delete"
-           onclick="return confirm('Supprimer définitivement ce morceau ?')">❌ Supprimer</a>
+        <a class="restore" href="/restore/{{ r.id }}">🔁 Restaurer</a>
+        <a class="delete" href="/delete_refused/{{ r.id }}">🗑 Supprimer</a>
       </div>
     </div>
     {% endfor %}
