@@ -86,6 +86,13 @@
     }
   </style>
   <script>
+    let debounceTimer;
+
+    function debouncePreview() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(fetchPreview, 500);
+    }
+
     async function fetchPreview() {
       const title = document.querySelector('input[name="title"]').value;
       const artist = document.querySelector('input[name="artist"]').value;
@@ -141,8 +148,8 @@
 
   <form method="POST">
     <input type="text" name="login" placeholder="Ton login (obligatoire)" required>
-    <input type="text" name="title" placeholder="Titre" required oninput="fetchPreview()">
-    <input type="text" name="artist" placeholder="Artiste" required oninput="fetchPreview()">
+    <input type="text" name="title" placeholder="Titre" required oninput="debouncePreview()">
+    <input type="text" name="artist" placeholder="Artiste" required oninput="debouncePreview()">
     <button type="submit">Proposer</button>
   </form>
 
