@@ -12,7 +12,6 @@
       margin: 0;
       padding: 0;
     }
-
     header {
       background-color: #ff5252;
       padding: 1rem;
@@ -21,7 +20,6 @@
       font-weight: bold;
       color: #fff;
     }
-
     .top-links {
       display: flex;
       justify-content: center;
@@ -30,7 +28,6 @@
       padding: 0.8rem;
       flex-wrap: wrap;
     }
-
     .top-links a {
       color: #ff5252;
       text-decoration: none;
@@ -40,7 +37,6 @@
       padding: 0.4rem 0.8rem;
       border-radius: 6px;
     }
-
     .container {
       display: flex;
       flex-wrap: wrap;
@@ -48,7 +44,6 @@
       padding: 1rem;
       justify-content: center;
     }
-
     .card {
       background-color: #1e1e1e;
       border-radius: 12px;
@@ -56,52 +51,28 @@
       width: 280px;
       box-shadow: 0 0 8px rgba(0,0,0,0.4);
     }
-
     .info {
       display: flex;
       gap: 1rem;
       align-items: center;
     }
-
     .info img {
       width: 80px;
       height: 80px;
       border-radius: 8px;
       object-fit: cover;
     }
-
     .details {
       flex: 1;
     }
-
     .details div {
       margin-bottom: 0.4rem;
     }
-
-    .audio-preview {
-      margin-top: 1rem;
-      text-align: center;
-    }
-
-    audio {
-      width: 100%;
-      margin-top: 0.5rem;
-    }
-
-    .explicit-warning {
-      margin-top: 0.5rem;
-      color: #ff5252;
-      font-weight: bold;
-      font-size: 0.9rem;
-      text-align: center;
-    }
-
     .actions {
       display: flex;
       justify-content: space-between;
       margin-top: 1rem;
     }
-
     .actions a {
       flex: 1;
       text-align: center;
@@ -112,24 +83,23 @@
       font-weight: bold;
       margin: 0 0.2rem;
     }
-
     .restore {
       background-color: #1DB954;
     }
-
     .delete {
       background-color: #d32f2f;
     }
-
-    @media (max-width: 600px) {
-      .card {
-        width: 100%;
-      }
-
-      .top-links {
-        flex-direction: column;
-        align-items: center;
-      }
+    iframe {
+      width: 100%;
+      height: 80px;
+      margin-top: 0.5rem;
+      border-radius: 8px;
+    }
+    .explicit {
+      color: #f44336;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
@@ -153,22 +123,12 @@
           <div><strong>👤 Login:</strong> {{ r.login }}</div>
           <div><strong>🎵 Titre:</strong> {{ r.title }}</div>
           <div><strong>🎤 Artiste:</strong> {{ r.artist }}</div>
+          {% if r.explicit %}<div class="explicit">⚠️ Explicite</div>{% endif %}
         </div>
       </div>
-
-      {% if r.preview_url %}
-      <div class="audio-preview">
-        <audio controls>
-          <source src="{{ r.preview_url }}" type="audio/mpeg">
-          Votre navigateur ne supporte pas la lecture audio.
-        </audio>
-      </div>
+      {% if r.track_id %}
+      <iframe src="https://open.spotify.com/embed/track/{{ r.track_id }}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
       {% endif %}
-
-      {% if r.explicit %}
-      <div class="explicit-warning">⚠️ Ce morceau est explicite</div>
-      {% endif %}
-
       <div class="actions">
         <a class="restore" href="/restore/{{ r.id }}">🔁 Restaurer</a>
         <a class="delete" href="/delete_refused/{{ r.id }}">🗑 Supprimer</a>
