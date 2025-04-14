@@ -123,6 +123,16 @@ def validate(id):
         db.session.commit()
     return redirect(url_for("admin"))
 
+@app.route("/reject/<int:id>")
+def reject(id):
+    if not session.get("admin"):
+        return redirect("/admin-login")
+    p = Proposal.query.get(id)
+    if p:
+        p.status = "refused"
+        db.session.commit()
+    return redirect(url_for("admin"))
+
 @app.route("/refused")
 def view_refused():
     if not session.get("admin"):
@@ -145,16 +155,6 @@ def view_refused():
             r.explicit = False
             r.track_id = ""
     return render_template("refused.html", refused=refused)
-
-@app.route("/reject/<int:id>")
-def reject(id):
-    if not session.get("admin"):
-        return redirect("/admin-login")
-    p = Proposal.query.get(id)
-    if p:
-        p.status = "refused"
-        db.session.commit()
-    return redirect(url_for("admin"))
 
 @app.route("/restore/<int:id>")
 def restore(id):
@@ -183,6 +183,27 @@ def delete_all_refused():
     Proposal.query.filter_by(status="refused").delete()
     db.session.commit()
     return redirect(url_for("view_refused"))
+
+@app.route("/preview")
+def preview():
+    title = request.args.get("title", "")
+    artist = request.args.get("artist", "")
+    if not title or not artist:
+        return jsonify({"found": False})
+    sp = get_spotify_client()
+    query = f"{title} {artist}"
+    results = sp.search(q=query, limit=1, type="track")
+    tracks = results.get("tracks", {}).get("items", [])
+    if not tracks:
+        return jsonify({"found": False})
+    track = tracks[0]
+    return jsonify({
+        "found": True,
+        "image": track["album"]["images"][0]["url"] if track["album"]["images"] else "",
+        "preview_url": track.get("preview_url"),
+        "explicit": track.get("explicit", False),
+        "track_id": track["id"]
+    })
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
