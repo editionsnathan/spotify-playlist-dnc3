@@ -53,9 +53,8 @@
       background-color: #1e1e1e;
       border-radius: 12px;
       padding: 1rem;
-      width: 280px;
+      width: 300px;
       box-shadow: 0 0 8px rgba(0,0,0,0.4);
-      position: relative;
     }
 
     .info {
@@ -77,6 +76,33 @@
 
     .details div {
       margin-bottom: 0.4rem;
+    }
+
+    .explicit {
+      color: #ff5252;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    .player-btn {
+      margin-top: 0.5rem;
+      background: #1DB954;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .player-wrapper {
+      display: none;
+      margin-top: 0.5rem;
+    }
+
+    .player-wrapper iframe {
+      border-radius: 12px;
+      width: 100%;
     }
 
     .actions {
@@ -104,29 +130,6 @@
       background-color: #d32f2f;
     }
 
-    .explicit {
-      color: #ff5252;
-      font-weight: bold;
-      margin-top: 0.5rem;
-    }
-
-    .player-btn {
-      margin-top: 0.5rem;
-      background: #333;
-      color: #1DB954;
-      padding: 0.4rem 0.8rem;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-
-    iframe {
-      margin-top: 0.5rem;
-      border-radius: 12px;
-      display: none;
-    }
-
     @media (max-width: 600px) {
       .card {
         width: 100%;
@@ -135,47 +138,49 @@
   </style>
   <script>
     function togglePlayer(id) {
-      const iframe = document.getElementById("player-" + id);
-      iframe.style.display = iframe.style.display === "block" ? "none" : "block";
+      const wrapper = document.getElementById("player-" + id);
+      wrapper.style.display = wrapper.style.display === "block" ? "none" : "block";
     }
   </script>
 </head>
 <body>
 
-  <header>🛠 Interface Admin</header>
+<header>🛠 Interface Admin</header>
 
-  <div class="top-links">
-    <a href="/refused">📂 Voir les refus</a>
-    <a href="/stats">📊 Stats</a>
-  </div>
+<div class="top-links">
+  <a href="/refused">📂 Voir les refus</a>
+  <a href="/stats">📊 Stats</a>
+</div>
 
-  <div class="container">
-    {% for p in proposals %}
-    <div class="card">
-      <div class="info">
-        {% if p.image %}
-        <img src="{{ p.image }}" alt="cover">
+<div class="container">
+  {% for p in proposals %}
+  <div class="card">
+    <div class="info">
+      {% if p.image %}
+      <img src="{{ p.image }}" alt="cover">
+      {% endif %}
+      <div class="details">
+        <div><strong>👤 Login:</strong> {{ p.login }}</div>
+        <div><strong>🎵 Titre:</strong> {{ p.title }}</div>
+        <div><strong>🎤 Artiste:</strong> {{ p.artist }}</div>
+        {% if p.explicit %}
+        <div class="explicit">⚠️ Explicite</div>
         {% endif %}
-        <div class="details">
-          <div><strong>👤 Login:</strong> {{ p.login }}</div>
-          <div><strong>🎵 Titre:</strong> {{ p.title }}</div>
-          <div><strong>🎤 Artiste:</strong> {{ p.artist }}</div>
-          {% if p.explicit %}
-          <div class="explicit">⚠️ Explicite</div>
-          {% endif %}
-          {% if p.track_id %}
-          <button class="player-btn" onclick="togglePlayer({{ p.id }})">▶️ Aperçu</button>
-          <iframe id="player-{{ p.id }}" src="https://open.spotify.com/embed/track/{{ p.track_id }}" width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-          {% endif %}
+        {% if p.preview_url %}
+        <button class="player-btn" onclick="togglePlayer({{ p.id }})">▶️ Aperçu</button>
+        <div class="player-wrapper" id="player-{{ p.id }}">
+          <iframe src="https://open.spotify.com/embed/track/{{ p.track_id }}" height="152" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
-      </div>
-      <div class="actions">
-        <a class="validate" href="/validate/{{ p.id }}">✔ Valider</a>
-        <a class="reject" href="/reject/{{ p.id }}">✖ Refuser</a>
+        {% endif %}
       </div>
     </div>
-    {% endfor %}
+    <div class="actions">
+      <a class="validate" href="/validate/{{ p.id }}">✔ Valider</a>
+      <a class="reject" href="/reject/{{ p.id }}">✖ Refuser</a>
+    </div>
   </div>
+  {% endfor %}
+</div>
 
 </body>
 </html>
