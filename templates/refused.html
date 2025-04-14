@@ -78,6 +78,33 @@
       margin-bottom: 0.4rem;
     }
 
+    .explicit {
+      color: #ff5252;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    .player-btn {
+      margin-top: 0.5rem;
+      background: #ff5252;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .player-wrapper {
+      display: none;
+      margin-top: 0.5rem;
+    }
+
+    .player-wrapper iframe {
+      border-radius: 12px;
+      width: 100%;
+    }
+
     .actions {
       display: flex;
       justify-content: space-between;
@@ -114,36 +141,51 @@
       }
     }
   </style>
+  <script>
+    function togglePlayer(id) {
+      const wrapper = document.getElementById("player-" + id);
+      wrapper.style.display = wrapper.style.display === "block" ? "none" : "block";
+    }
+  </script>
 </head>
 <body>
 
-<header>❌ Morceaux Refusés</header>
+  <header>❌ Morceaux Refusés</header>
 
-<div class="top-links">
-  <a href="/admin">⬅ Retour admin</a>
-  <a href="/delete_all_refused">🗑 Tout supprimer</a>
-</div>
+  <div class="top-links">
+    <a href="/admin">⬅ Retour admin</a>
+    <a href="/delete_all_refused">🗑 Tout supprimer</a>
+  </div>
 
-<div class="container">
-  {% for r in refused %}
-  <div class="card">
-    <div class="info">
-      {% if r.image %}
-      <img src="{{ r.image }}" alt="cover">
-      {% endif %}
-      <div class="details">
-        <div><strong>👤 Login:</strong> {{ r.login }}</div>
-        <div><strong>🎵 Titre:</strong> {{ r.title }}</div>
-        <div><strong>🎤 Artiste:</strong> {{ r.artist }}</div>
+  <div class="container">
+    {% for r in refused %}
+    <div class="card">
+      <div class="info">
+        {% if r.image %}
+        <img src="{{ r.image }}" alt="cover">
+        {% endif %}
+        <div class="details">
+          <div><strong>👤 Login:</strong> {{ r.login }}</div>
+          <div><strong>🎵 Titre:</strong> {{ r.title }}</div>
+          <div><strong>🎤 Artiste:</strong> {{ r.artist }}</div>
+          {% if r.explicit %}
+          <div class="explicit">⚠️ Explicite</div>
+          {% endif %}
+          {% if r.preview_url and r.track_id %}
+          <button class="player-btn" onclick="togglePlayer({{ r.id }})">▶️ Aperçu</button>
+          <div class="player-wrapper" id="player-{{ r.id }}">
+            <iframe src="https://open.spotify.com/embed/track/{{ r.track_id }}" height="152" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="actions">
+        <a class="restore" href="/restore/{{ r.id }}">🔁 Restaurer</a>
+        <a class="delete" href="/delete_refused/{{ r.id }}">🗑 Supprimer</a>
       </div>
     </div>
-    <div class="actions">
-      <a class="restore" href="/restore/{{ r.id }}">🔁 Restaurer</a>
-      <a class="delete" href="/delete_refused/{{ r.id }}">🗑 Supprimer</a>
-    </div>
+    {% endfor %}
   </div>
-  {% endfor %}
-</div>
 
 </body>
 </html>
