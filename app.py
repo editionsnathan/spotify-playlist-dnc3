@@ -93,7 +93,15 @@ def admin():
         query = f"{p.title} {p.artist}"
         results = sp.search(q=query, limit=1, type="track")
         tracks = results.get("tracks", {}).get("items", [])
-        p.image = tracks[0]["album"]["images"][0]["url"] if tracks and tracks[0]["album"]["images"] else ""
+        if tracks:
+            track = tracks[0]
+            p.image = track["album"]["images"][0]["url"] if track["album"]["images"] else ""
+            p.preview_url = track.get("preview_url")
+            p.explicit = track.get("explicit", False)
+        else:
+            p.image = ""
+            p.preview_url = None
+            p.explicit = False
     return render_template("admin.html", proposals=proposals)
 
 @app.route("/validate/<int:id>")
@@ -133,7 +141,15 @@ def view_refused():
         query = f"{r.title} {r.artist}"
         results = sp.search(q=query, limit=1, type="track")
         tracks = results.get("tracks", {}).get("items", [])
-        r.image = tracks[0]["album"]["images"][0]["url"] if tracks and tracks[0]["album"]["images"] else ""
+        if tracks:
+            track = tracks[0]
+            r.image = track["album"]["images"][0]["url"] if track["album"]["images"] else ""
+            r.preview_url = track.get("preview_url")
+            r.explicit = track.get("explicit", False)
+        else:
+            r.image = ""
+            r.preview_url = None
+            r.explicit = False
     return render_template("refused.html", refused=refused)
 
 @app.route("/restore/<int:id>")
