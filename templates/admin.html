@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - Playlist DNC3</title>
+  <title>Morceaux Refusés - Playlist DNC3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
@@ -14,7 +14,7 @@
     }
 
     header {
-      background-color: #1DB954;
+      background-color: #ff5252;
       padding: 1rem;
       text-align: center;
       font-size: 1.5rem;
@@ -32,11 +32,11 @@
     }
 
     .top-links a {
-      color: #1DB954;
+      color: #ff5252;
       text-decoration: none;
       font-weight: bold;
       font-size: 0.95rem;
-      border: 1px solid #1DB954;
+      border: 1px solid #ff5252;
       padding: 0.4rem 0.8rem;
       border-radius: 6px;
     }
@@ -53,7 +53,7 @@
       background-color: #1e1e1e;
       border-radius: 12px;
       padding: 1rem;
-      width: 300px;
+      width: 280px;
       box-shadow: 0 0 8px rgba(0,0,0,0.4);
     }
 
@@ -113,11 +113,11 @@
       margin: 0 0.2rem;
     }
 
-    .validate {
+    .restore {
       background-color: #1DB954;
     }
 
-    .reject {
+    .delete {
       background-color: #d32f2f;
     }
 
@@ -135,43 +135,43 @@
 </head>
 <body>
 
-  <header>🛠 Interface Admin</header>
+  <header>❌ Morceaux Refusés</header>
 
   <div class="top-links">
-    <a href="/refused">📂 Voir les refus</a>
-    <a href="/stats">📊 Stats</a>
+    <a href="/admin">⬅ Retour admin</a>
+    <a href="/delete_all_refused">🗑 Tout supprimer</a>
   </div>
 
   <div class="container">
-    {% for p in proposals %}
+    {% for r in refused %}
     <div class="card">
       <div class="info">
-        {% if p.image %}
-        <img src="{{ p.image }}" alt="cover">
+        {% if r.image %}
+        <img src="{{ r.image }}" alt="cover">
         {% endif %}
         <div class="details">
-          <div><strong>👤 Login:</strong> {{ p.login }}</div>
-          <div><strong>🎵 Titre:</strong> {{ p.title }}</div>
-          <div><strong>🎤 Artiste:</strong> {{ p.artist }}</div>
+          <div><strong>👤 Login:</strong> {{ r.login }}</div>
+          <div><strong>🎵 Titre:</strong> {{ r.title }}</div>
+          <div><strong>🎤 Artiste:</strong> {{ r.artist }}</div>
         </div>
       </div>
 
-      {% if p.preview_url %}
+      {% if r.preview_url %}
       <div class="audio-preview">
         <audio controls>
-          <source src="{{ p.preview_url }}" type="audio/mpeg">
+          <source src="{{ r.preview_url }}" type="audio/mpeg">
           Votre navigateur ne supporte pas la lecture audio.
         </audio>
       </div>
       {% endif %}
 
-      {% if p.explicit %}
+      {% if r.explicit %}
       <div class="explicit-warning">⚠️ Ce morceau est explicite</div>
       {% endif %}
 
       <div class="actions">
-        <a class="validate" href="/validate/{{ p.id }}">✔ Valider</a>
-        <a class="reject" href="/reject/{{ p.id }}">✖ Refuser</a>
+        <a class="restore" href="/restore/{{ r.id }}">🔁 Restaurer</a>
+        <a class="delete" href="/delete_refused/{{ r.id }}">🗑 Supprimer</a>
       </div>
     </div>
     {% endfor %}
