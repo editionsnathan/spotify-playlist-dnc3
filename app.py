@@ -72,6 +72,30 @@ def submit():
     db.session.commit()
     return render_template("submitted.html")
 
+@app.route("/preview")
+def preview():
+    title = request.args.get("title", "")
+    artist = request.args.get("artist", "")
+    if not title or not artist:
+        return jsonify({"found": False})
+    
+    sp = get_spotify_client()
+    query = f"{title} {artist}"
+    results = sp.search(q=query, limit=1, type="track")
+    tracks = results.get("tracks", {}).get("items", [])
+    
+    if not tracks:
+        return jsonify({"found": False})
+    
+    track = tracks[0]
+    return jsonify({
+        "found": True,
+        "image": track["album"]["images"][0]["url"] if track["album"]["images"] else "",
+        "preview_url": track.get("preview_url"),
+        "explicit": track.get("explicit", False),
+        "track_id": track["id"]
+    })
+
 @app.route("/admin-login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
