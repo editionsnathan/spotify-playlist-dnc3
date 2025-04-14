@@ -53,7 +53,7 @@
       background-color: #1e1e1e;
       border-radius: 12px;
       padding: 1rem;
-      width: 280px;
+      width: 300px;
       box-shadow: 0 0 8px rgba(0,0,0,0.4);
     }
 
@@ -76,6 +76,24 @@
 
     .details div {
       margin-bottom: 0.4rem;
+    }
+
+    .audio-preview {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .explicit-warning {
+      margin-top: 0.5rem;
+      color: #ff5252;
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-align: center;
     }
 
     .actions {
@@ -137,6 +155,20 @@
           <div><strong>🎤 Artiste:</strong> {{ p.artist }}</div>
         </div>
       </div>
+
+      {% if p.preview_url %}
+      <div class="audio-preview">
+        <audio controls>
+          <source src="{{ p.preview_url }}" type="audio/mpeg">
+          Votre navigateur ne supporte pas la lecture audio.
+        </audio>
+      </div>
+      {% endif %}
+
+      {% if p.explicit %}
+      <div class="explicit-warning">⚠️ Ce morceau est explicite</div>
+      {% endif %}
+
       <div class="actions">
         <a class="validate" href="/validate/{{ p.id }}">✔ Valider</a>
         <a class="reject" href="/reject/{{ p.id }}">✖ Refuser</a>
