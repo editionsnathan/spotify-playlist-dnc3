@@ -89,19 +89,38 @@
     .delete {
       background-color: #d32f2f;
     }
-    iframe {
-      width: 100%;
-      height: 80px;
-      margin-top: 0.5rem;
-      border-radius: 8px;
-    }
     .explicit {
-      color: #f44336;
+      color: #ff5252;
       font-weight: bold;
-      font-size: 0.9rem;
       margin-top: 0.5rem;
+    }
+    .player-btn {
+      margin-top: 0.5rem;
+      background: #333;
+      color: #1DB954;
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    iframe {
+      margin-top: 0.5rem;
+      border-radius: 12px;
+      display: none;
+    }
+    @media (max-width: 600px) {
+      .card {
+        width: 100%;
+      }
     }
   </style>
+  <script>
+    function togglePlayer(id) {
+      const iframe = document.getElementById("player-" + id);
+      iframe.style.display = iframe.style.display === "block" ? "none" : "block";
+    }
+  </script>
 </head>
 <body>
 
@@ -123,12 +142,15 @@
           <div><strong>👤 Login:</strong> {{ r.login }}</div>
           <div><strong>🎵 Titre:</strong> {{ r.title }}</div>
           <div><strong>🎤 Artiste:</strong> {{ r.artist }}</div>
-          {% if r.explicit %}<div class="explicit">⚠️ Explicite</div>{% endif %}
+          {% if r.explicit %}
+          <div class="explicit">⚠️ Explicite</div>
+          {% endif %}
+          {% if r.preview_url %}
+          <button class="player-btn" onclick="togglePlayer({{ r.id }})">▶️ Écouter</button>
+          <iframe id="player-{{ r.id }}" src="https://open.spotify.com/embed/track/{{ r.track_id }}" width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+          {% endif %}
         </div>
       </div>
-      {% if r.track_id %}
-      <iframe src="https://open.spotify.com/embed/track/{{ r.track_id }}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-      {% endif %}
       <div class="actions">
         <a class="restore" href="/restore/{{ r.id }}">🔁 Restaurer</a>
         <a class="delete" href="/delete_refused/{{ r.id }}">🗑 Supprimer</a>
